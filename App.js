@@ -28,7 +28,8 @@ export default function App() {
   return (
     <KeyboardAvoidingView
       style={styles.container}
-      behavior={Platform.select({ ios: 'padding', android: null })}
+      behavior={Platform.select({ ios: 'padding', android: 'height' })}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? 0 : 20}
     >
       <View style={styles.content}>
         <Text style={styles.title}>On-Device Sentiment</Text>
@@ -59,22 +60,24 @@ export default function App() {
             <Text style={styles.buttonText}>Analyze</Text>
           )}
         </TouchableOpacity>
-      </View>
 
-      {result && !loading && (
-        <View
-          style={[
-            styles.outputContainer,
-            result === 'Positive' ? styles.outputPos : styles.outputNeg,
-            styles.absoluteOutput
-          ]}
-        >
-          <Text style={styles.outputEmoji}>
-            {result === 'Positive' ? '😊' : '😞'}
-          </Text>
-          <Text style={styles.outputText}>{result}</Text>
+        {/* always‑there reserved space */}
+        <View style={styles.resultWrapper}>
+          {result && !loading && (
+            <View
+              style={[
+                styles.outputContainer,
+                result === 'Positive' ? styles.outputPos : styles.outputNeg
+              ]}
+            >
+              <Text style={styles.outputEmoji}>
+                {result === 'Positive' ? '😊' : '😞'}
+              </Text>
+              <Text style={styles.outputText}>{result}</Text>
+            </View>
+          )}
         </View>
-      )}
+      </View>
     </KeyboardAvoidingView>
   );
 }
@@ -85,8 +88,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     padding: 24,
     justifyContent: 'center',
-    alignItems: 'center',
-    position: 'relative'
+    alignItems: 'center'
   },
   content: {
     width: '100%',
@@ -108,26 +110,26 @@ const styles = StyleSheet.create({
     marginBottom: 16
   },
   analyzeButton: {
-    backgroundColor: 'black',  // darker light blue
+    backgroundColor: 'black',
     paddingVertical: 14,
     borderRadius: 25,
     alignItems: 'center',
-    marginBottom: 16,
     elevation: 3
   },
   disabledButton: {
-    backgroundColor: 'gray'  // lighter disabled blue
+    backgroundColor: 'gray'
   },
   buttonText: {
     color: '#fff',
     fontSize: 16,
     fontWeight: '600'
   },
-  absoluteOutput: {
-    position: 'absolute',
-    bottom: 270,
-    left: 24,
-    right: 24
+  // reserved slot so nothing moves
+  resultWrapper: {
+    height: 64,        // enough to fit your bubble
+    marginTop: 16,     // gap under the button
+    alignItems: 'center',
+    justifyContent: 'center'
   },
   outputContainer: {
     flexDirection: 'row',
@@ -136,7 +138,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 12,
     borderRadius: 50,
-    marginVertical: 8,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -144,10 +145,10 @@ const styles = StyleSheet.create({
     elevation: 3
   },
   outputPos: {
-    backgroundColor: '#BBDEFB'  // theme light blue
+    backgroundColor: '#BBDEFB'
   },
   outputNeg: {
-    backgroundColor: 'gray'  // theme light red
+    backgroundColor: 'gray'
   },
   outputEmoji: {
     fontSize: 32,
